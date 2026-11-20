@@ -137,6 +137,9 @@ function activate(context) {
   }
 
   async function resolveSession(arg) {
+    if (arg && arg.session && arg.session.path) {
+      return arg.session;
+    }
     if (arg && arg.path) {
       return arg;
     }

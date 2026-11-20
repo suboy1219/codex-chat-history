@@ -10,6 +10,7 @@ const clipboard = [];
 const externalLinks = [];
 const terminalCommands = [];
 const terminals = [];
+let quickPickCount = 0;
 let panelMessageHandler = null;
 let treeView = null;
 let config = {};
@@ -190,7 +191,10 @@ const vscodeMock = {
       terminals.push(terminal);
       return terminal;
     },
-    showQuickPick: async () => undefined,
+    showQuickPick: async () => {
+      quickPickCount += 1;
+      return undefined;
+    },
     showInputBox: async () => undefined,
     showInformationMessage: async () => undefined,
     showWarningMessage: async () => undefined,
@@ -238,6 +242,16 @@ async function main() {
 
   const groups = treeView.treeDataProvider.getChildren();
   assert.ok(Array.isArray(groups), 'tree root children');
+  assert.ok(
+    !groups.some((group) => /最近 \d+ 天/.test(String(group.label))),
+    'sessions are grouped by individual day'
+  );
+  assert.ok(
+    groups.every((group) =>
+      /^(今天|昨天|\d+月\d+日|\d+年\d+月\d+日|日期未知) \(\d+\)$/.test(String(group.label))
+    ),
+    'day labels use today, yesterday, or a concrete date'
+  );
   const sessions = groups.flatMap((group) => (group.group ? group.group.sessions : []));
   assert.ok(sessions.length > 0, 'real sessions discovered');
   const first = sessions[0];
@@ -286,6 +300,11 @@ async function main() {
     externalLinks.some((link) => String(link) === 'vscode://openai.chatgpt/local/01a1f7d3-60ae-7861-8172-fec0b736d1ed'),
     'deep link opened for default Codex home'
   );
+
+  const treeItem = treeView.treeDataProvider.createSessionItem(localSession);
+  const quickPicksBefore = quickPickCount;
+  await commands.get('codexHistory.openInCodex')(treeItem);
+  assert.strictEqual(quickPickCount, quickPicksBefore, 'context menu item resolves session without picker');
 
   config.codexPath = process.execPath;
   await commands.get('codexHistory.openInCodex')({

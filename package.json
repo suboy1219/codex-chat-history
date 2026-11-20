@@ -2,7 +2,7 @@
   "name": "codex-chat-history",
   "displayName": "Codex 聊天记录",
   "description": "在 VS Code 中浏览本机 Codex 会话的完整聊天记录：消息、工具调用、思考过程与截图。",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "publisher": "local-dev",
   "license": "MIT",
   "engines": {
@@ -248,7 +248,7 @@
         "codexHistory.groupByDate": {
           "type": "boolean",
           "default": true,
-          "description": "按今天、昨天、最近 7 天等分组显示会话。"
+          "description": "按天分组显示会话（今天、昨天、11月18日…）。"
         },
         "codexHistory.showToolCalls": {
           "type": "boolean",

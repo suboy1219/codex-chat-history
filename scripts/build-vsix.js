@@ -20,10 +20,10 @@ function walk(dir, files) {
 
 function collectFiles() {
   const files = [];
-  for (const name of ['extension.js', 'package.json', 'README.md']) {
+  for (const name of ['extension.js', 'package.json', 'README.md', 'README.en.md']) {
     files.push(path.join(root, name));
   }
-  for (const dir of ['src', 'media']) {
+  for (const dir of ['src', 'media', 'docs']) {
     walk(path.join(root, dir), files);
   }
   return files;
@@ -132,6 +132,7 @@ const contentTypes = `<?xml version="1.0" encoding="utf-8"?>
   <Default Extension="js" ContentType="application/javascript"/>
   <Default Extension="css" ContentType="text/css"/>
   <Default Extension="svg" ContentType="image/svg+xml"/>
+  <Default Extension="png" ContentType="image/png"/>
   <Default Extension="md" ContentType="text/markdown"/>
   <Default Extension="vsixmanifest" ContentType="text/xml"/>
 </Types>`;

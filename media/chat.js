@@ -209,6 +209,36 @@
     return article;
   }
 
+  function toolBrief(item) {
+    const raw = String(item.input || '');
+    if (raw.trim().startsWith('{')) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          for (const key of ['path', 'file', 'command', 'query', 'pattern', 'url', 'name']) {
+            const value = parsed[key];
+            if (typeof value === 'string' && value.trim()) {
+              return value.trim();
+            }
+          }
+          const first = Object.values(parsed).find(
+            (value) => typeof value === 'string' && value.trim()
+          );
+          if (first) {
+            return first.trim();
+          }
+        }
+      } catch (error) {
+        // Fall back to the raw first line.
+      }
+    }
+    return (
+      String(item.input || item.output || '')
+        .split('\n')
+        .find((line) => line.trim()) || ''
+    );
+  }
+
   function renderTool(item, index) {
     const article = el('article', 'item tool');
     article.id = `m-${index}`;
@@ -220,8 +250,7 @@
     }
     const summary = document.createElement('summary');
     summary.appendChild(el('span', 'tool-name', item.name || 'tool'));
-    const brief = String(item.input || item.output || '').split('\n').find((line) => line.trim()) || '';
-    summary.appendChild(el('span', 'tool-brief', brief.trim().slice(0, 140)));
+    summary.appendChild(el('span', 'tool-brief', toolBrief(item).slice(0, 140)));
     summary.appendChild(el('span', 'tool-output-mark', item.output ? '有输出' : '无输出'));
     details.appendChild(summary);
 

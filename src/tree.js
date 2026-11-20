@@ -45,26 +45,29 @@ function formatWhen(iso) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+function pad2(value) {
+  return String(value).padStart(2, '0');
+}
+
 function groupFor(iso) {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) {
-    return { key: 'earlier', label: '更早' };
+    return { key: 'unknown', label: '日期未知', sortValue: Number.NEGATIVE_INFINITY };
   }
   const now = new Date();
   const diffDays = Math.round((startOfDay(now) - startOfDay(date)) / 86400000);
-  if (diffDays <= 0) {
-    return { key: 'today', label: '今天' };
+  const key = `day:${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+  let label;
+  if (diffDays === 0) {
+    label = '今天';
+  } else if (diffDays === 1) {
+    label = '昨天';
+  } else if (date.getFullYear() === now.getFullYear()) {
+    label = `${date.getMonth() + 1}月${date.getDate()}日`;
+  } else {
+    label = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
   }
-  if (diffDays === 1) {
-    return { key: 'yesterday', label: '昨天' };
-  }
-  if (diffDays < 7) {
-    return { key: 'week', label: '最近 7 天' };
-  }
-  if (diffDays < 30) {
-    return { key: 'month', label: '最近 30 天' };
-  }
-  return { key: 'earlier', label: '更早' };
+  return { key, label, sortValue: startOfDay(date).getTime() };
 }
 
 class CodexTreeProvider {
@@ -96,7 +99,6 @@ class CodexTreeProvider {
       if (!groupByDate) {
         return sessions.map((session) => this.createSessionItem(session));
       }
-      const order = ['today', 'yesterday', 'week', 'month', 'earlier'];
       const buckets = new Map();
       for (const session of sessions) {
         const group = groupFor(session.updatedAt);
@@ -105,19 +107,14 @@ class CodexTreeProvider {
         }
         buckets.get(group.key).sessions.push(session);
       }
-      const groups = [];
-      for (const key of order) {
-        const bucket = buckets.get(key);
-        if (!bucket) {
-          continue;
-        }
+      const groups = Array.from(buckets.values()).sort((a, b) => b.sortValue - a.sortValue);
+      return groups.map((bucket) => {
         const item = new vscode.TreeItem(`${bucket.label} (${bucket.sessions.length})`, vscode.TreeItemCollapsibleState.Expanded);
         item.iconPath = new vscode.ThemeIcon('calendar');
         item.contextValue = 'codexGroup';
         item.group = bucket;
-        groups.push(item);
-      }
-      return groups;
+        return item;
+      });
     }
 
     if (element.group) {
@@ -135,6 +132,7 @@ class CodexTreeProvider {
     }
     item.description = parts.filter(Boolean).join(' · ');
     item.id = session.path;
+    item.session = session;
     item.contextValue = session.archived ? 'codexSessionArchived' : 'codexSession';
     item.iconPath = new vscode.ThemeIcon(session.archived ? 'archive' : 'comment-discussion');
     item.command = {
