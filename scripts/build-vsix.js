@@ -20,7 +20,7 @@ function walk(dir, files) {
 
 function collectFiles() {
   const files = [];
-  for (const name of ['extension.js', 'package.json', 'README.md', 'README.en.md']) {
+  for (const name of ['extension.js', 'package.json', 'README.md', 'README.en.md', 'LICENSE', 'CHANGELOG.md']) {
     files.push(path.join(root, name));
   }
   for (const dir of ['src', 'media', 'docs']) {

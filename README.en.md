@@ -1,8 +1,12 @@
-# Codex Chat History for VS Code
+# Codex History Lens for VS Code
 
 English | [简体中文](README.md)
 
+Now available on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=hkle.codex-history-lens-hkle). Follow the link to install.
+
 Browse your local Codex sessions inside VS Code and jump back into the original conversation with one click. The extension only reads the rollout files Codex already stores on disk: nothing is modified or uploaded.
+
+> This is an unofficial community extension and is not affiliated with OpenAI.
 
 ![Chat panel and session sidebar](docs/images/overview-dark.png)
 
@@ -25,13 +29,23 @@ The same panel in the light theme:
 
 ## Install
 
+### Install from the VS Code Marketplace
+
+Open the [Codex History Lens Marketplace page](https://marketplace.visualstudio.com/items?itemName=hkle.codex-history-lens-hkle) and click **Install**, or run:
+
+```powershell
+code --install-extension hkle.codex-history-lens-hkle
+```
+
+### Install from VSIX
+
 From a terminal:
 
 ```powershell
-code --install-extension .\dist\codex-chat-history-1.2.0.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.2.0.vsix
 ```
 
-Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-chat-history-1.2.0.vsix`.
+Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-history-lens-hkle-1.2.0.vsix`.
 
 After installation, a **Codex 聊天** icon appears in the activity bar. You can also run **Codex: 打开聊天记录** from the Command Palette.
 

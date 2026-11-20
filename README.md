@@ -1,8 +1,12 @@
-# Codex 聊天记录（VS Code 扩展）
+# Codex History Lens（Codex 聊天记录）
 
 [English](README.en.md) | 简体中文
 
+已发布到 [VS Code 扩展商店](https://marketplace.visualstudio.com/items?itemName=hkle.codex-history-lens-hkle)，点击链接即可安装。
+
 在 VS Code 里直接翻阅本机 Codex 的历史会话，并一键回到 Codex 继续对话。插件只读取 Codex 自己保存的 rollout 记录，不修改、不上传任何数据。
+
+> 这是一个社区扩展，与 OpenAI 无隶属关系。
 
 ![聊天面板与历史会话侧栏](docs/images/overview-dark.png)
 
@@ -25,13 +29,23 @@
 
 ## 安装
 
+### 从 VS Code 扩展商店安装
+
+打开 [Codex History Lens 商店页面](https://marketplace.visualstudio.com/items?itemName=hkle.codex-history-lens-hkle)，点击 **Install**；也可以在终端执行：
+
+```powershell
+code --install-extension hkle.codex-history-lens-hkle
+```
+
+### 从 VSIX 安装
+
 方式一：在 VSIX 所在目录执行命令行安装。
 
 ```powershell
-code --install-extension .\dist\codex-chat-history-1.2.0.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.2.0.vsix
 ```
 
-方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-chat-history-1.2.0.vsix`。
+方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.2.0.vsix`。
 
 安装后左侧活动栏会出现 **Codex 聊天** 图标；也可以按 `Ctrl+Shift+P` 执行 **Codex: 打开聊天记录**。
 

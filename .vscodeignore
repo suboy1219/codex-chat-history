@@ -1,4 +1,5 @@
 test/**
 scripts/**
+PUBLISHING.md
 *.vsix
 .vscode/**

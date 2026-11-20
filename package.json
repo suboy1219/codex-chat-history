@@ -1,10 +1,19 @@
 {
-  "name": "codex-chat-history",
-  "displayName": "Codex 聊天记录",
+  "name": "codex-history-lens-hkle",
+  "displayName": "Codex History Lens",
   "description": "在 VS Code 中浏览本机 Codex 会话的完整聊天记录：消息、工具调用、思考过程与截图。",
   "version": "1.2.0",
-  "publisher": "local-dev",
+  "publisher": "hkle",
   "license": "MIT",
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/suboy1219/codex-chat-history.git"
+  },
+  "bugs": {
+    "url": "https://github.com/suboy1219/codex-chat-history/issues"
+  },
+  "homepage": "https://github.com/suboy1219/codex-chat-history#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -40,7 +49,7 @@
         {
           "id": "codexHistory.sessions",
           "name": "历史会话",
-          "contextualTitle": "Codex 聊天记录"
+          "contextualTitle": "Codex History Lens"
         }
       ]
     },
@@ -221,7 +230,7 @@
       ]
     },
     "configuration": {
-      "title": "Codex 聊天记录",
+      "title": "Codex History Lens",
       "properties": {
         "codexHistory.codexHome": {
           "type": "string",
