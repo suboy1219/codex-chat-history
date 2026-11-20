@@ -11,6 +11,7 @@
 - 跨会话全文搜索：命令面板执行 **Codex: 在全部会话内容中搜索**，命中后直接跳到对应消息。
 - 点击回复里的本地文件链接可直接打开对应文件与行号；`http(s)` 链接用系统浏览器打开。
 - 一键导出为 Markdown，或打开原始 `.jsonl` 记录。
+- 会话右键可直接**在 Codex 中继续对话**；已归档的会话显示**还原到 Codex 对话**，会自动取消归档并打开。
 - 监听 `sessions/**/*.jsonl`，会话进行中也能刷新/自动更新。
 - 跟随 VS Code 明暗主题，除 VS Code 本身外无第三方依赖。
 
@@ -19,10 +20,10 @@
 方式一：在 VSIX 所在目录执行命令行安装。
 
 ```powershell
-code --install-extension .\dist\codex-chat-history-1.0.0.vsix
+code --install-extension .\dist\codex-chat-history-1.1.0.vsix
 ```
 
-方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-chat-history-1.0.0.vsix`。
+方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-chat-history-1.1.0.vsix`。
 
 安装后左侧活动栏会出现 **Codex 聊天** 图标；也可以按 `Ctrl+Shift+P` 执行 **Codex: 打开聊天记录**。
 
@@ -42,13 +43,25 @@ code --install-extension .\dist\codex-chat-history-1.0.0.vsix
 }
 ```
 
-插件只做只读解析。删除、归档、修改会话仍需在 Codex 中操作。
+除用户主动点击「还原到 Codex 对话」时调用 `codex unarchive` 外，插件只做只读解析。
+
+## 还原到 Codex
+
+在侧栏的会话条目上点右键：
+
+- 普通会话：**在 Codex 中继续对话**。插件通过 `vscode://openai.chatgpt/local/<会话ID>` 直接打开 Codex 侧栏里的对应会话。
+- 已归档会话（需先开启 `codexHistory.showArchived`）：**还原到 Codex 对话**。插件先执行 `codex unarchive <会话ID>`，再打开该对话。
+
+还原需要能定位 `codex` 可执行文件。查找顺序为：`codexHistory.codexPath` → PATH → Codex VS Code 扩展自带的 `bin/**/codex`。
+
+如果会话不在 Codex VS Code 扩展使用的数据目录（默认 `~/.codex`）中，深链无法加载该会话，插件会改为在集成终端执行 `codex resume <会话ID> --all`，仍然可以继续原来的对话。
 
 ## 设置
 
 | 设置 | 默认值 | 说明 |
 | --- | --- | --- |
 | `codexHistory.codexHome` | 空 | Codex 数据目录，留空时用 `CODEX_HOME` 或 `~/.codex` |
+| `codexHistory.codexPath` | 空 | `codex` 可执行文件路径，留空时自动查找 PATH 与 Codex 扩展自带版本 |
 | `codexHistory.maxSessions` | `300` | 侧栏最多显示的会话数 |
 | `codexHistory.showArchived` | `false` | 是否显示已归档会话 |
 | `codexHistory.groupByDate` | `true` | 是否按日期分组 |
@@ -64,6 +77,8 @@ code --install-extension .\dist\codex-chat-history-1.0.0.vsix
 - `Codex: 只看当前工作区的会话`
 - `Codex: 在全部会话内容中搜索`
 - `Codex: 打开 Codex 数据目录`
+- `Codex: 在 Codex 中继续对话`（会话右键）
+- `Codex: 还原到 Codex 对话`（已归档会话右键）
 
 会话条目的右键菜单还可以导出 Markdown、打开原始记录、在文件资源管理器中显示。
 
@@ -73,6 +88,8 @@ code --install-extension .\dist\codex-chat-history-1.0.0.vsix
 - 思考过程只有在记录里存在明文摘要时才会显示。Codex 常见的加密 reasoning 内容无法解密，因此不会显示。
 - 用户消息中内嵌的图片只在有 `input_image` 数据时显示；历史版本可能只记录文本。
 - 全文搜索会流式读取全部会话文件，会话很多时第一次搜索会有几秒耗时。
+- 「还原」依赖 Codex VS Code 扩展的 `/local/<会话ID>` 深链。该路由是扩展内部的未公开接口，Codex 升级后格式可能变化；变化时插件会回退到 `codex resume` 终端方式。
+- Codex 扩展默认只加载 `~/.codex` 下的会话。若插件配置了其他 `CODEX_HOME`，那些会话只能在终端里 `resume`，不会出现在扩展侧栏。
 
 ## 开发与打包
 
@@ -95,6 +112,7 @@ src/store.js         会话索引、缓存、全文搜索
 src/tree.js          侧栏树
 src/panel.js         Webview 聊天面板
 src/exporter.js      Markdown 导出与本地链接跳转
+src/codexCli.js      定位 codex、取消归档、深链与终端恢复命令
 src/markdownExport.js 导出格式
 media/               面板样式、Markdown 渲染、交互脚本
 test/                解析与渲染测试

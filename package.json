@@ -2,7 +2,7 @@
   "name": "codex-chat-history",
   "displayName": "Codex 聊天记录",
   "description": "在 VS Code 中浏览本机 Codex 会话的完整聊天记录：消息、工具调用、思考过程与截图。",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "local-dev",
   "license": "MIT",
   "engines": {
@@ -21,7 +21,9 @@
   "main": "./extension.js",
   "activationEvents": [
     "onView:codexHistory.sessions",
-    "onCommand:codexHistory.open"
+    "onCommand:codexHistory.open",
+    "onCommand:codexHistory.openInCodex",
+    "onCommand:codexHistory.restoreSession"
   ],
   "contributes": {
     "viewsContainers": {
@@ -59,6 +61,18 @@
         "command": "codexHistory.openSession",
         "title": "打开选中的聊天记录",
         "category": "Codex"
+      },
+      {
+        "command": "codexHistory.openInCodex",
+        "title": "在 Codex 中继续对话",
+        "category": "Codex",
+        "icon": "$(link-external)"
+      },
+      {
+        "command": "codexHistory.restoreSession",
+        "title": "还原到 Codex 对话",
+        "category": "Codex",
+        "icon": "$(history)"
       },
       {
         "command": "codexHistory.refresh",
@@ -150,6 +164,16 @@
       ],
       "view/item/context": [
         {
+          "command": "codexHistory.openInCodex",
+          "when": "view == codexHistory.sessions && viewItem == codexSession",
+          "group": "1_codex@1"
+        },
+        {
+          "command": "codexHistory.restoreSession",
+          "when": "view == codexHistory.sessions && viewItem == codexSessionArchived",
+          "group": "1_codex@1"
+        },
+        {
           "command": "codexHistory.export",
           "when": "view == codexHistory.sessions && viewItem =~ /codexSession/",
           "group": "1_export@1"
@@ -183,6 +207,14 @@
           "when": "false"
         },
         {
+          "command": "codexHistory.openInCodex",
+          "when": "false"
+        },
+        {
+          "command": "codexHistory.restoreSession",
+          "when": "false"
+        },
+        {
           "command": "codexHistory.clearFilter",
           "when": "false"
         }
@@ -195,6 +227,11 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Codex 数据目录，默认使用环境变量 `CODEX_HOME`，否则为 `~/.codex`。插件读取其中的 `sessions/**/*.jsonl` 与 `session_index.jsonl`。"
+        },
+        "codexHistory.codexPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "`codex` 可执行文件路径，用于取消归档与 `codex resume`。留空时依次查找 PATH 和 Codex VS Code 扩展自带的 `bin/**/codex`。"
         },
         "codexHistory.maxSessions": {
           "type": "number",
@@ -232,7 +269,7 @@
     }
   },
   "scripts": {
-    "test": "node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
+    "test": "node test/codexCli.test.js && node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
     "build:vsix": "node scripts/build-vsix.js"
   }
 }

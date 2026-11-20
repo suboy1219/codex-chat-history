@@ -6,6 +6,14 @@ const { CodexStore } = require('./src/store');
 const { CodexTreeProvider, formatWhen } = require('./src/tree');
 const { ChatPanel } = require('./src/panel');
 const { exportSession, openSessionFile } = require('./src/exporter');
+const {
+  buildCodexDeepLink,
+  buildResumeCommand,
+  codexExtensionHome,
+  findCodexExecutable,
+  isSessionInExtensionHome,
+  unarchiveSession
+} = require('./src/codexCli');
 
 const TYPE_LABELS = {
   user: '你',
@@ -135,6 +143,111 @@ function activate(context) {
     return pickSession();
   }
 
+  function clipText(value, max) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    return text.length > max ? `${text.slice(0, max - 1)}…` : text;
+  }
+
+  function configuredCodexPath() {
+    return String(vscode.workspace.getConfiguration('codexHistory').get('codexPath', '') || '').trim();
+  }
+
+  function hasCodexExtension() {
+    return Boolean(
+      vscode.extensions &&
+        typeof vscode.extensions.getExtension === 'function' &&
+        vscode.extensions.getExtension('openai.chatgpt')
+    );
+  }
+
+  async function showCodexCliMissing() {
+    const configured = configuredCodexPath();
+    const message = configured
+      ? `找不到 codex 可执行文件：${configured}。请检查设置 codexHistory.codexPath。`
+      : '找不到 codex 可执行文件。请安装 Codex 扩展，或设置 codexHistory.codexPath。';
+    const action = await vscode.window.showErrorMessage(message, '打开设置');
+    if (action === '打开设置') {
+      await vscode.commands.executeCommand('workbench.action.openSettings', 'codexHistory.codexPath');
+    }
+  }
+
+  async function restoreInCodex(sessionInfo) {
+    const session = await resolveSession(sessionInfo);
+    if (!session) {
+      return;
+    }
+    const canDeepLink = hasCodexExtension() && isSessionInExtensionHome(session.path);
+    let executable = null;
+
+    if (session.archived || !canDeepLink) {
+      executable = findCodexExecutable({ configured: configuredCodexPath() });
+      if (!executable) {
+        await showCodexCliMissing();
+        return;
+      }
+    }
+
+    if (session.archived) {
+      try {
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: `正在还原「${clipText(session.title, 40)}」`
+          },
+          () => unarchiveSession(executable.path, session)
+        );
+      } catch (error) {
+        const action = await vscode.window.showErrorMessage(
+          `取消归档失败：${error.message}`,
+          '复制命令'
+        );
+        if (action === '复制命令') {
+          await vscode.env.clipboard.writeText(`codex unarchive ${session.id}`);
+        }
+        return;
+      }
+      store.invalidate();
+      refreshAll(false);
+    }
+
+    if (canDeepLink) {
+      try {
+        const opened = await vscode.env.openExternal(vscode.Uri.parse(buildCodexDeepLink(session.id)));
+        if (opened) {
+          vscode.window.showInformationMessage(
+            session.archived
+              ? `已还原并在 Codex 中打开：${clipText(session.title, 60)}`
+              : `已在 Codex 中打开：${clipText(session.title, 60)}`
+          );
+          return;
+        }
+      } catch (error) {
+        // Fall through to the terminal resume path.
+      }
+    }
+
+    if (!executable) {
+      executable = findCodexExecutable({ configured: configuredCodexPath() });
+      if (!executable) {
+        await showCodexCliMissing();
+        return;
+      }
+    }
+
+    const cwd = session.cwd && fs.existsSync(session.cwd) ? session.cwd : undefined;
+    const terminal = vscode.window.createTerminal({
+      name: `Codex · ${clipText(session.title, 28)}`,
+      cwd
+    });
+    terminal.show();
+    terminal.sendText(buildResumeCommand(executable.path, session.id), true);
+    vscode.window.showInformationMessage(
+      session.archived
+        ? `已取消归档，并在终端中用 codex resume 恢复：${clipText(session.title, 60)}`
+        : `该会话不在 Codex 扩展的数据目录（${codexExtensionHome()}）中，已在终端中恢复。`
+    );
+  }
+
   register('codexHistory.open', async () => {
     const session = await pickSession();
     if (session) {
@@ -152,6 +265,10 @@ function activate(context) {
     }
     ChatPanel.createOrShow(context, store, session);
   });
+
+  register('codexHistory.openInCodex', (session) => restoreInCodex(session));
+
+  register('codexHistory.restoreSession', (session) => restoreInCodex(session));
 
   register('codexHistory.refresh', () => {
     watchRoots();

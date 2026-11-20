@@ -8,6 +8,8 @@ const watchers = [];
 const panels = [];
 const clipboard = [];
 const externalLinks = [];
+const terminalCommands = [];
+const terminals = [];
 let panelMessageHandler = null;
 let treeView = null;
 let config = {};
@@ -113,6 +115,9 @@ function createFakePanel() {
 }
 
 const vscodeMock = {
+  extensions: {
+    getExtension: (id) => (id === 'openai.chatgpt' ? { id, isActive: true } : undefined)
+  },
   EventEmitter,
   TreeItem,
   ThemeIcon,
@@ -126,7 +131,13 @@ const vscodeMock = {
   TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
   Uri: {
     file: uriOf,
-    parse: (value) => uriOf(String(value).replace(/^file:\/\//i, '')),
+    parse: (value) => {
+      const text = String(value);
+      if (/^file:\/\//i.test(text)) {
+        return uriOf(text.replace(/^file:\/\//i, ''));
+      }
+      return { fsPath: text, scheme: text.split(':')[0], toString: () => text };
+    },
     joinPath: (base, ...parts) => uriOf([base.fsPath, ...parts].join('\\'))
   },
   RelativePattern: class RelativePattern {
@@ -168,6 +179,17 @@ const vscodeMock = {
       return treeView;
     },
     createWebviewPanel: () => createFakePanel(),
+    createTerminal: (options) => {
+      const terminal = {
+        options,
+        show() {},
+        sendText(text) {
+          terminalCommands.push(text);
+        }
+      };
+      terminals.push(terminal);
+      return terminal;
+    },
     showQuickPick: async () => undefined,
     showInputBox: async () => undefined,
     showInformationMessage: async () => undefined,
@@ -186,7 +208,10 @@ const vscodeMock = {
   },
   env: {
     clipboard: { writeText: async (text) => clipboard.push(text) },
-    openExternal: async (uri) => externalLinks.push(uri.fsPath || uri)
+    openExternal: async (uri) => {
+      externalLinks.push(uri.fsPath || uri);
+      return true;
+    }
   }
 };
 
@@ -239,6 +264,40 @@ async function main() {
   panelMessageHandler({ type: 'openLink', href: 'javascript:alert(1)' });
   await new Promise((resolve) => setTimeout(resolve, 10));
   assert.strictEqual(externalLinks.length, 0, 'javascript link blocked');
+
+  const codexHome = require('os').homedir();
+  const localSession = {
+    id: '01a1f7d3-60ae-7861-8172-fec0b736d1ed',
+    title: '本地会话',
+    path: require('path').join(
+      codexHome,
+      '.codex',
+      'sessions',
+      '2026',
+      '11',
+      '20',
+      'rollout-2026-11-20T15-19-47-01a1f7d3-60ae-7861-8172-fec0b736d1ed.jsonl'
+    ),
+    cwd: '',
+    archived: false
+  };
+  await commands.get('codexHistory.openInCodex')(localSession);
+  assert.ok(
+    externalLinks.some((link) => String(link) === 'vscode://openai.chatgpt/local/01a1f7d3-60ae-7861-8172-fec0b736d1ed'),
+    'deep link opened for default Codex home'
+  );
+
+  config.codexPath = process.execPath;
+  await commands.get('codexHistory.openInCodex')({
+    id: '01a1f452-6bc3-7532-aebe-514e5e5b004f',
+    title: '外部目录会话',
+    path: require('path').join('D:\\other-home', 'sessions', 'rollout-2026-11-20T10-00-00-x.jsonl'),
+    cwd: '',
+    archived: false
+  });
+  assert.strictEqual(terminals.length, 1, 'terminal fallback created');
+  assert.ok(terminalCommands[0].includes('resume'), 'terminal resumes session');
+  assert.ok(terminalCommands[0].includes('01a1f452-6bc3-7532-aebe-514e5e5b004f'), 'terminal uses session id');
 
   panelMessageHandler({ type: 'refresh' });
   const refreshCount = panel.webview.messages.filter((message) => message.type === 'session').length;
