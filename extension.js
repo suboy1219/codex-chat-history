@@ -6,6 +6,7 @@ const { CodexStore } = require('./src/store');
 const { CodexTreeProvider, formatWhen } = require('./src/tree');
 const { ChatPanel } = require('./src/panel');
 const { exportSession, openSessionFile } = require('./src/exporter');
+const { registerHelp } = require('./src/help');
 const {
   buildCodexDeepLink,
   buildResumeCommand,
@@ -113,6 +114,8 @@ function activate(context) {
   function register(command, handler) {
     context.subscriptions.push(vscode.commands.registerCommand(command, handler));
   }
+
+  registerHelp(register);
 
   async function pickSession(options) {
     const opts = options || {};

@@ -1,5 +1,7 @@
 # Codex History Lens（Codex 聊天记录）
 
+官网: [https://suboy1219.github.io/suboy](https://suboy1219.github.io/suboy)
+
 [English](README.en.md) | 简体中文
 
 已发布到 [VS Code 扩展商店](https://marketplace.visualstudio.com/items?itemName=hkle.codex-history-lens-hkle)，点击链接即可安装。
@@ -42,10 +44,10 @@ code --install-extension hkle.codex-history-lens-hkle
 方式一：在 VSIX 所在目录执行命令行安装。
 
 ```powershell
-code --install-extension .\dist\codex-history-lens-hkle-1.2.0.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.2.1.vsix
 ```
 
-方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.2.0.vsix`。
+方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.2.1.vsix`。
 
 安装后左侧活动栏会出现 **Codex 聊天** 图标；也可以按 `Ctrl+Shift+P` 执行 **Codex: 打开聊天记录**。
 
@@ -60,9 +62,15 @@ code --install-extension .\dist\codex-history-lens-hkle-1.2.0.vsix
 
 如果会话不在 Codex VS Code 扩展使用的数据目录（默认 `~/.codex`）中，深链无法加载该会话，插件会改为在集成终端执行 `codex resume <会话ID> --all`，仍然可以继续原来的对话。
 
+## 帮助与更新
+
+点击历史会话侧栏工具栏的 **帮助（问号）**，可打开 **使用说明、检测更新、访问官网、关于 Codex History Lens**；也可以在命令面板中搜索对应的 **Codex** 命令。
+
+检测更新仅在主动点击时联网，对比当前版本与本项目 GitHub 最新正式发布版；发现新版后可选择打开发布页下载 VSIX。无正式发布版、网络失败或请求受限时会显示提示。通过商店安装的扩展也可使用 VS Code 自带的扩展更新功能。
+
 ## 数据与隐私
 
-- 所有解析都在本地完成，没有遥测、没有网络上传。
+- 会话解析在本地完成，无遥测、不上传会话。只有主动点击检测更新时才向 GitHub 发起 HTTPS 请求，User-Agent 中包含扩展版本，不携带聊天数据；不会后台自动检测。
 - 插件默认只读。只有你主动点击「还原到 Codex 对话」时，才会调用 `codex unarchive` 修改归档状态。
 - 本文档中的截图全部使用虚构会话：`demo-app`、`~/projects/demo-app`、`src/pages/login.tsx` 等均为示例，不包含任何真实账号、路径或聊天内容。
 - 截图由 `node scripts/render-demo.js` 生成，该脚本使用内置的演示数据，不会读取 `sessions` 目录。

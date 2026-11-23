@@ -2,7 +2,7 @@
   "name": "codex-history-lens-hkle",
   "displayName": "Codex History Lens",
   "description": "在 VS Code 中浏览本机 Codex 会话的完整聊天记录：消息、工具调用、思考过程与截图。",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "publisher": "hkle",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -136,6 +136,30 @@
         "title": "打开 Codex 数据目录",
         "category": "Codex",
         "icon": "$(folder-opened)"
+      },
+      {
+        "command": "codexHistory.openHelp",
+        "title": "使用说明",
+        "category": "Codex",
+        "icon": "$(book)"
+      },
+      {
+        "command": "codexHistory.checkForUpdates",
+        "title": "检测更新",
+        "category": "Codex",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "codexHistory.openWebsite",
+        "title": "访问官网",
+        "category": "Codex",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "codexHistory.about",
+        "title": "关于 Codex History Lens",
+        "category": "Codex",
+        "icon": "$(info)"
       }
     ],
     "menus": {
@@ -169,6 +193,11 @@
           "command": "codexHistory.revealCodexHome",
           "when": "view == codexHistory.sessions",
           "group": "9_more@1"
+        },
+        {
+          "submenu": "codexHistory.help",
+          "when": "view == codexHistory.sessions",
+          "group": "navigation@6"
         }
       ],
       "view/item/context": [
@@ -227,6 +256,24 @@
           "command": "codexHistory.clearFilter",
           "when": "false"
         }
+      ],
+      "codexHistory.help": [
+        {
+          "command": "codexHistory.openHelp",
+          "group": "1_help@1"
+        },
+        {
+          "command": "codexHistory.checkForUpdates",
+          "group": "1_help@2"
+        },
+        {
+          "command": "codexHistory.openWebsite",
+          "group": "1_help@3"
+        },
+        {
+          "command": "codexHistory.about",
+          "group": "1_help@4"
+        }
       ]
     },
     "configuration": {
@@ -275,10 +322,17 @@
           "description": "打开会话时默认展开工具调用的输入与输出。"
         }
       }
-    }
+    },
+    "submenus": [
+      {
+        "id": "codexHistory.help",
+        "label": "帮助",
+        "icon": "$(question)"
+      }
+    ]
   },
   "scripts": {
-    "test": "node test/codexCli.test.js && node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
+    "test": "node test/updates.test.js && node test/help.test.js && node test/codexCli.test.js && node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
     "build:vsix": "node scripts/build-vsix.js"
   }
 }

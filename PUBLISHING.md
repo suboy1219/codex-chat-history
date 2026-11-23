@@ -43,7 +43,7 @@
 npx --yes @vscode/vsce package
 ```
 
-生成 `codex-history-lens-hkle-1.2.0.vsix`。如果报错，按提示修复后重新执行。
+生成 `codex-history-lens-hkle-1.2.1.vsix`。如果报错，按提示修复后重新执行。
 
 ## 四、发布
 
