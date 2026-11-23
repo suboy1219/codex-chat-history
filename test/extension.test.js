@@ -129,6 +129,7 @@ const vscodeMock = {
   ProgressLocation: { Notification: 15 },
   ViewColumn: { Active: -1 },
   TextEditorRevealType: { InCenter: 1 },
+  StatusBarAlignment: { Right: 2 },
   TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
   Uri: {
     file: uriOf,
@@ -168,6 +169,7 @@ const vscodeMock = {
     fs: { writeFile: async () => {} }
   },
   window: {
+    createStatusBarItem: () => ({ show() {}, dispose() {} }),
     createTreeView: (id, options) => {
       treeView = {
         id,
@@ -231,6 +233,7 @@ async function main() {
   const extension = require('../extension');
   const context = {
     subscriptions: [],
+    secrets: { get: async () => undefined, onDidChange: () => ({ dispose() {} }) },
     extensionUri: uriOf('D:\\fake-extension')
   };
 
@@ -326,6 +329,7 @@ async function main() {
   assert.ok(treeView.badge === undefined, 'badge cleared without filter');
 
   extension.deactivate();
+  for (const subscription of context.subscriptions) { subscription.dispose(); }
   console.log(`extension: ok (${sessions.length} sessions, ${panel.webview.messages.length} panel messages)`);
 }
 

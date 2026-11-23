@@ -7,6 +7,7 @@ const { CodexTreeProvider, formatWhen } = require('./src/tree');
 const { ChatPanel } = require('./src/panel');
 const { exportSession, openSessionFile } = require('./src/exporter');
 const { registerHelp } = require('./src/help');
+const { registerAccounts } = require('./src/accountCommands');
 const {
   buildCodexDeepLink,
   buildResumeCommand,
@@ -25,6 +26,7 @@ const TYPE_LABELS = {
 };
 
 function activate(context) {
+  registerAccounts(context);
   const store = new CodexStore(context);
   const state = { query: '', workspaceOnly: false };
   const provider = new CodexTreeProvider(store, state);

@@ -2,7 +2,7 @@
   "name": "codex-history-lens-hkle",
   "displayName": "Codex History Lens",
   "description": "在 VS Code 中浏览本机 Codex 会话的完整聊天记录：消息、工具调用、思考过程与截图。",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "publisher": "hkle",
   "license": "MIT",
   "icon": "media/icon.png",
@@ -32,7 +32,8 @@
     "onView:codexHistory.sessions",
     "onCommand:codexHistory.open",
     "onCommand:codexHistory.openInCodex",
-    "onCommand:codexHistory.restoreSession"
+    "onCommand:codexHistory.restoreSession",
+    "onStartupFinished"
   ],
   "contributes": {
     "viewsContainers": {
@@ -160,6 +161,30 @@
         "title": "关于 Codex History Lens",
         "category": "Codex",
         "icon": "$(info)"
+      },
+      {
+        "command": "codexHistory.switchAccount",
+        "title": "切换 Codex 账号",
+        "category": "Codex",
+        "icon": "$(account)"
+      },
+      {
+        "command": "codexHistory.saveAccount",
+        "title": "保存当前 Codex 登录账号",
+        "category": "Codex",
+        "icon": "$(save)"
+      },
+      {
+        "command": "codexHistory.addAccount",
+        "title": "添加 Codex 账号（官方网页登录）",
+        "category": "Codex",
+        "icon": "$(add)"
+      },
+      {
+        "command": "codexHistory.removeAccount",
+        "title": "移除已保存的 Codex 账号",
+        "category": "Codex",
+        "icon": "$(trash)"
       }
     ],
     "menus": {
@@ -198,6 +223,11 @@
           "submenu": "codexHistory.help",
           "when": "view == codexHistory.sessions",
           "group": "navigation@6"
+        },
+        {
+          "command": "codexHistory.switchAccount",
+          "when": "view == codexHistory.sessions",
+          "group": "navigation@0"
         }
       ],
       "view/item/context": [
@@ -320,6 +350,12 @@
           "type": "boolean",
           "default": false,
           "description": "打开会话时默认展开工具调用的输入与输出。"
+        },
+        "codexHistory.accountHome": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "账号切换使用的登录缓存目录。留空使用 `CODEX_HOME` 或 `~/.codex`。必须与官方 Codex 扩展实际使用的目录一致；与历史记录目录 `codexHistory.codexHome` 独立。仅支持 `cli_auth_credentials_store = \"file\"`。"
         }
       }
     },
@@ -332,7 +368,7 @@
     ]
   },
   "scripts": {
-    "test": "node test/updates.test.js && node test/help.test.js && node test/codexCli.test.js && node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
+    "test": "node test/accounts.test.js && node test/accountCommands.test.js && node test/updates.test.js && node test/help.test.js && node test/codexCli.test.js && node test/parser.test.js && node test/renderer.test.js && node test/extension.test.js",
     "build:vsix": "node scripts/build-vsix.js"
   }
 }
