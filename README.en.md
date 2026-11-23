@@ -44,10 +44,10 @@ code --install-extension hkle.codex-history-lens-hkle
 From a terminal:
 
 ```powershell
-code --install-extension .\dist\codex-history-lens-hkle-1.3.0.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.3.1.vsix
 ```
 
-Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-history-lens-hkle-1.3.0.vsix`.
+Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-history-lens-hkle-1.3.1.vsix`.
 
 After installation, a **Codex 聊天** icon appears in the activity bar. You can also run **Codex: 打开聊天记录** from the Command Palette.
 

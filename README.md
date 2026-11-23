@@ -44,10 +44,10 @@ code --install-extension hkle.codex-history-lens-hkle
 方式一：在 VSIX 所在目录执行命令行安装。
 
 ```powershell
-code --install-extension .\dist\codex-history-lens-hkle-1.3.0.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.3.1.vsix
 ```
 
-方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.3.0.vsix`。
+方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.3.1.vsix`。
 
 安装后左侧活动栏会出现 **Codex 聊天** 图标；也可以按 `Ctrl+Shift+P` 执行 **Codex: 打开聊天记录**。
 

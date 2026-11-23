@@ -35,15 +35,17 @@ function registerAccounts(context) {
     }
     status.show();
   }
+  function showAccountError(error) {
+    // Never forward arbitrary JSON/CLI output or filesystem paths containing credentials.
+    void vscode.window.showErrorMessage(error.code ? `账号操作失败（${error.code}），未能完成切换。` : error.message);
+  }
   function register(name, handler) {
     context.subscriptions.push(vscode.commands.registerCommand(`codexHistory.${name}`, async () => {
       if (busy) { return vscode.window.showInformationMessage('账号操作正在进行，请稍候。'); }
       busy = true;
       try { await handler(getStore()); }
-      catch (error) {
-        // Never forward arbitrary JSON/CLI output or filesystem paths containing credentials.
-        await vscode.window.showErrorMessage(error.code ? `账号操作失败（${error.code}），未能完成切换。` : error.message);
-      } finally { busy = false; await refresh(); }
+      catch (error) { showAccountError(error); }
+      finally { busy = false; await refresh(); }
     }));
   }
   async function labelFor(defaultValue) {
@@ -60,7 +62,8 @@ function registerAccounts(context) {
     const label = await labelFor(info.email || '我的账号');
     if (!label) { return; }
     await store.save(raw, label);
-    await vscode.window.showInformationMessage(`已加密保存账号“${label}”。`);
+    // Notifications can stay open indefinitely; they must not hold the account lock.
+    void vscode.window.showInformationMessage(`已加密保存账号“${label}”。`);
   }
   async function add(store) {
     const label = await labelFor('另一个账号');
@@ -71,7 +74,7 @@ function registerAccounts(context) {
       location: vscode.ProgressLocation.Notification, title: '请在浏览器中登录要添加的 ChatGPT 账号（可取消，5 分钟超时）', cancellable: true
     }, (_, token) => loginAccount(executable.path, token));
     await store.save(raw, label);
-    await vscode.window.showInformationMessage(`已加密保存“${label}”，点击状态栏即可切换。`);
+    void vscode.window.showInformationMessage(`已加密保存“${label}”，点击状态栏即可切换。`);
   }
   async function switchAccount(store) {
     const accounts = await store.list();
@@ -91,8 +94,10 @@ function registerAccounts(context) {
     if (answer !== '切换账号') { return; }
     const label = await store.switchTo(picked.account.id);
     await refresh();
-    const reload = await vscode.window.showInformationMessage(`已写入“${label}”的登录缓存；重载窗口后让 Codex 使用此账号。`, '重载窗口');
-    if (reload === '重载窗口') { await vscode.commands.executeCommand('workbench.action.reloadWindow'); }
+    void vscode.window.showInformationMessage(`已写入“${label}”的登录缓存；重载窗口后让 Codex 使用此账号。`, '重载窗口')
+      .then(async (reload) => {
+        if (reload === '重载窗口') { await vscode.commands.executeCommand('workbench.action.reloadWindow'); }
+      }).catch(showAccountError);
   }
   async function remove(store) {
     const picked = await vscode.window.showQuickPick((await store.list()).map((account) => ({ label: account.label, account })), { title: '移除已保存账号' });

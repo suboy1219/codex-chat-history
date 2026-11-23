@@ -18,6 +18,10 @@ async function main() {
   let confirmation;
   let input;
   let lastPicker;
+  let holdNotifications = false;
+  const pendingNotifications = [];
+  const notificationResult = (value) => holdNotifications
+    ? new Promise((resolve) => pendingNotifications.push(resolve)) : value;
   const status = { show() {}, dispose() {} };
   const context = { subscriptions: [], secrets: {
     get: async (key) => values.get(key), store: async (key, value) => values.set(key, value),
@@ -25,6 +29,7 @@ async function main() {
   } };
   const mock = {
     StatusBarAlignment: { Right: 2 },
+    ProgressLocation: { Notification: 15 },
     workspace: {
       getConfiguration: () => ({ get: (key, fallback) => key === 'accountHome' ? home : fallback }),
       onDidChangeConfiguration: () => ({ dispose() {} })
@@ -34,8 +39,9 @@ async function main() {
       showInputBox: async () => input,
       showQuickPick: async (items) => { lastPicker = items; const choose = picks.shift(); return choose ? choose(items) : undefined; },
       showWarningMessage: async () => confirmation,
-      showInformationMessage: async (message) => { infos.push(message); return '重载窗口'; },
-      showErrorMessage: async (message) => errors.push(message)
+      showInformationMessage: async (message) => { infos.push(message); return notificationResult('重载窗口'); },
+      showErrorMessage: async (message) => { errors.push(message); return notificationResult(undefined); },
+      withProgress: async (_, task) => task({}, {})
     },
     commands: {
       registerCommand: (name, handler) => { commands.set(name, handler); return { dispose() {} }; },
@@ -43,7 +49,14 @@ async function main() {
     }
   };
   const original = Module._load;
-  Module._load = function(request, ...args) { return request === 'vscode' ? mock : original.call(this, request, ...args); };
+  Module._load = function(request, ...args) {
+    if (request === 'vscode') { return mock; }
+    if (request === './accounts') {
+      return { ...original.call(this, request, ...args), loginAccount: async () => auth('browser') };
+    }
+    if (request === './codexCli') { return { findCodexExecutable: () => ({ path: 'fake-codex' }) }; }
+    return original.call(this, request, ...args);
+  };
   const claims = (user) => Buffer.from(JSON.stringify({ sub: user, email: `${user}@example.test` })).toString('base64url');
   const auth = (user) => JSON.stringify({ tokens: { access_token: 'fake', refresh_token: 'fake', id_token: `x.${claims(user)}.x`, account_id: user } });
   try {
@@ -77,7 +90,65 @@ async function main() {
     await commands.get('codexHistory.saveAccount')();
     assert.strictEqual(errors.length, 1);
     assert.ok(!errors[0].includes('private-text'), 'errors do not echo credentials');
-    console.log('account commands: ok (save, cancel, switch, reload, remove, status, errors)');
+
+    async function notificationDoesNotBlock(command, action) {
+      holdNotifications = true;
+      const executedCount = executed.length;
+      let completed = false;
+      const operation = commands.get(`codexHistory.${command}`)().then(() => { completed = true; });
+      let nextOperation;
+      try {
+        await new Promise(setImmediate);
+        assert.ok(pendingNotifications.length, `${command} displays a notification`);
+        assert.ok(completed, `${command} must finish while its notification remains open`);
+        assert.strictEqual(executed.length, executedCount, 'reload waits for an explicit action');
+        lastPicker = undefined;
+        nextOperation = commands.get('codexHistory.switchAccount')();
+        await new Promise(setImmediate);
+        assert.ok(Array.isArray(lastPicker), 'account picker reopens without dismissing the notification');
+        await nextOperation;
+      } finally {
+        holdNotifications = false;
+        for (const resolve of pendingNotifications.splice(0)) { resolve(action); }
+        await operation;
+        if (nextOperation) { await nextOperation; }
+      }
+      await new Promise(setImmediate);
+      if (action === '重载窗口') {
+        assert.strictEqual(executed.length, executedCount + 1, 'reload action still works after releasing the lock');
+        assert.strictEqual(executed[executed.length - 1], 'workbench.action.reloadWindow');
+      }
+    }
+
+    // VS Code notifications remain pending until dismissed or an action is selected.
+    fs.writeFileSync(store.authPath, auth('a'));
+    input = '个人';
+    await notificationDoesNotBlock('saveAccount');
+    input = '浏览器账号';
+    await notificationDoesNotBlock('addAccount');
+    picks.push((items) => items.find((item) => item.account && item.account.email === 'browser@example.test'));
+    confirmation = '切换账号';
+    await notificationDoesNotBlock('switchAccount', '重载窗口');
+    assert.strictEqual(fs.readFileSync(store.authPath, 'utf8'), auth('browser'));
+    fs.writeFileSync(store.authPath, '{bad json');
+    await notificationDoesNotBlock('saveAccount');
+
+    // Keep serialization while an actual account interaction is still pending.
+    fs.writeFileSync(store.authPath, auth('a'));
+    let cancelInput;
+    input = new Promise((resolve) => { cancelInput = resolve; });
+    const saving = commands.get('codexHistory.saveAccount')();
+    try {
+      await new Promise(setImmediate);
+      const infoCount = infos.length;
+      await commands.get('codexHistory.switchAccount')();
+      assert.strictEqual(infos.length, infoCount + 1);
+      assert.ok(infos[infos.length - 1].includes('账号操作正在进行'));
+    } finally { cancelInput(undefined); await saving; }
+    lastPicker = undefined;
+    await commands.get('codexHistory.switchAccount')();
+    assert.ok(Array.isArray(lastPicker), 'cancelled input releases the account lock');
+    console.log('account commands: ok (save, cancel, switch, reload, remove, status, errors, pending notifications, serialization)');
   } finally {
     Module._load = original;
     for (const subscription of context.subscriptions) { subscription.dispose(); }
