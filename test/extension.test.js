@@ -14,6 +14,7 @@ let quickPickCount = 0;
 let panelMessageHandler = null;
 let treeView = null;
 let config = {};
+let decorationProvider = null;
 
 class EventEmitter {
   constructor() {
@@ -32,6 +33,10 @@ class EventEmitter {
       listener(value);
     }
   }
+
+  dispose() {
+    this.listeners = [];
+  }
 }
 
 class TreeItem {
@@ -42,6 +47,13 @@ class TreeItem {
 }
 
 class ThemeIcon {
+  constructor(id, color) {
+    this.id = id;
+    this.color = color;
+  }
+}
+
+class ThemeColor {
   constructor(id) {
     this.id = id;
   }
@@ -122,6 +134,7 @@ const vscodeMock = {
   EventEmitter,
   TreeItem,
   ThemeIcon,
+  ThemeColor,
   MarkdownString,
   Position,
   Range,
@@ -133,6 +146,7 @@ const vscodeMock = {
   TreeItemCollapsibleState: { None: 0, Collapsed: 1, Expanded: 2 },
   Uri: {
     file: uriOf,
+    from: (components) => ({ ...components, toString: () => `${components.scheme}:${components.path}` }),
     parse: (value) => {
       const text = String(value);
       if (/^file:\/\//i.test(text)) {
@@ -169,6 +183,10 @@ const vscodeMock = {
     fs: { writeFile: async () => {} }
   },
   window: {
+    registerFileDecorationProvider: (provider) => {
+      decorationProvider = provider;
+      return { dispose() {} };
+    },
     createStatusBarItem: () => ({ show() {}, dispose() {} }),
     createTreeView: (id, options) => {
       treeView = {
@@ -231,8 +249,13 @@ Module._load = function patchedLoad(request, parent, isMain) {
 
 async function main() {
   const extension = require('../extension');
+  const savedState = new Map();
   const context = {
     subscriptions: [],
+    globalState: {
+      get: (key, fallback) => savedState.has(key) ? savedState.get(key) : fallback,
+      update: async (key, value) => savedState.set(key, value)
+    },
     secrets: { get: async () => undefined, onDidChange: () => ({ dispose() {} }) },
     extensionUri: uriOf('D:\\fake-extension')
   };
@@ -305,6 +328,49 @@ async function main() {
   );
 
   const treeItem = treeView.treeDataProvider.createSessionItem(localSession);
+  const provider = treeView.treeDataProvider;
+  let treeChanges = 0;
+  let decorationChanges = 0;
+  provider.onDidChangeTreeData(() => { treeChanges += 1; });
+  decorationProvider.onDidChangeFileDecorations(() => { decorationChanges += 1; });
+  assert.strictEqual(decorationProvider.provideFileDecoration(treeItem.resourceUri), undefined);
+  await commands.get('codexHistory.followSession')(treeItem);
+  const followedItem = provider.createSessionItem(localSession);
+  assert.strictEqual(followedItem.contextValue, 'codexSessionFollowed');
+  assert.strictEqual(followedItem.iconPath.id, 'star-full');
+  assert.strictEqual(followedItem.iconPath.color.id, 'codexHistory.followedForeground');
+  assert.ok(followedItem.tooltip.value.includes('已关注'));
+  assert.strictEqual(decorationProvider.provideFileDecoration(treeItem.resourceUri).color.id, 'codexHistory.followedForeground');
+  assert.strictEqual(decorationProvider.provideFileDecoration(uriOf(localSession.path)), undefined, 'ordinary files are not colored');
+  assert.ok(treeChanges > 0 && decorationChanges > 0, 'following updates the tree and its existing decorations');
+
+  const { FollowedSessions } = require('../src/follows');
+  const restoredFollows = new FollowedSessions(context.globalState);
+  assert.ok(restoredFollows.has(localSession), 'followed sessions survive extension restart');
+  const archivedSession = { ...localSession, archived: true, path: localSession.path.replace('sessions', 'archived_sessions') };
+  assert.ok(restoredFollows.has(archivedSession), 'follow state follows the session ID when archived');
+  assert.strictEqual(provider.createSessionItem(archivedSession).contextValue, 'codexSessionArchivedFollowed');
+  const quickPicksBeforeFollow = quickPickCount;
+  await commands.get('codexHistory.unfollowSession')(provider.createSessionItem(archivedSession));
+  const unfollowedItem = provider.createSessionItem(localSession);
+  assert.strictEqual(unfollowedItem.contextValue, 'codexSession');
+  assert.strictEqual(unfollowedItem.iconPath.id, 'comment-discussion');
+  assert.strictEqual(decorationProvider.provideFileDecoration(followedItem.resourceUri), undefined);
+  assert.strictEqual(quickPickCount, quickPicksBeforeFollow, 'context menu acts on the clicked session');
+  const afterUnfollow = new FollowedSessions(context.globalState);
+  assert.ok(!afterUnfollow.has(localSession), 'unfollowing is persisted');
+
+  const secondSession = { ...localSession, id: 'second-session' };
+  await Promise.all([decorationProvider.set(localSession, true), decorationProvider.set(secondSession, true)]);
+  const afterConcurrentFollow = new FollowedSessions(context.globalState);
+  assert.ok(afterConcurrentFollow.has(localSession) && afterConcurrentFollow.has(secondSession), 'concurrent follows do not overwrite each other');
+  const failingState = { get: () => [], update: async () => { throw new Error('storage unavailable'); } };
+  const failedFollows = new FollowedSessions(failingState);
+  await assert.rejects(failedFollows.set(localSession, true), /storage unavailable/);
+  assert.ok(!failedFollows.has(localSession), 'failed storage write does not change the displayed state');
+  for (const follows of [restoredFollows, afterUnfollow, afterConcurrentFollow, failedFollows]) {
+    follows.dispose();
+  }
   const quickPicksBefore = quickPickCount;
   await commands.get('codexHistory.openInCodex')(treeItem);
   assert.strictEqual(quickPickCount, quickPicksBefore, 'context menu item resolves session without picker');

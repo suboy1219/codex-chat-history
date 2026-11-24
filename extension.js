@@ -4,6 +4,7 @@ const fs = require('fs');
 const vscode = require('vscode');
 const { CodexStore } = require('./src/store');
 const { CodexTreeProvider, formatWhen } = require('./src/tree');
+const { FollowedSessions } = require('./src/follows');
 const { ChatPanel } = require('./src/panel');
 const { exportSession, openSessionFile } = require('./src/exporter');
 const { registerHelp } = require('./src/help');
@@ -29,7 +30,9 @@ function activate(context) {
   registerAccounts(context);
   const store = new CodexStore(context);
   const state = { query: '', workspaceOnly: false };
-  const provider = new CodexTreeProvider(store, state);
+  const followed = new FollowedSessions(context.globalState);
+  context.subscriptions.push(followed, vscode.window.registerFileDecorationProvider(followed));
+  const provider = new CodexTreeProvider(store, state, followed);
   const view = vscode.window.createTreeView('codexHistory.sessions', {
     treeDataProvider: provider,
     showCollapseAll: true
@@ -277,6 +280,22 @@ function activate(context) {
   register('codexHistory.openInCodex', (session) => restoreInCodex(session));
 
   register('codexHistory.restoreSession', (session) => restoreInCodex(session));
+
+  async function setFollowed(sessionInfo, value) {
+    const session = await resolveSession(sessionInfo);
+    if (!session) {
+      return;
+    }
+    try {
+      await followed.set(session, value);
+      provider.refresh();
+    } catch (error) {
+      vscode.window.showErrorMessage(`保存关注状态失败：${error.message}`);
+    }
+  }
+
+  register('codexHistory.followSession', (session) => setFollowed(session, true));
+  register('codexHistory.unfollowSession', (session) => setFollowed(session, false));
 
   register('codexHistory.refresh', () => {
     watchRoots();

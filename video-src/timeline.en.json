@@ -1,0 +1,98 @@
+{
+  "lang": "en",
+  "product": "Codex History Lens",
+  "platform": "youtube",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "voice": "en-US-AndrewNeural",
+  "rate": "+6%",
+  "pitch": "+0Hz",
+  "total": 44.326,
+  "scenes": [
+    {
+      "id": "s1",
+      "kicker": "01 / LOST THREAD",
+      "headline": "That fix from\nyesterday is gone",
+      "vo": "Yesterday Codex fixed that bug. Today you only remember roughly what you asked.",
+      "sub": "The thread from yesterday?\nGone.",
+      "min": 5.4,
+      "audio": 4.56,
+      "start": 0.0,
+      "dur": 5.71,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s2",
+      "kicker": "02 / WHAT IT IS",
+      "headline": "Every Codex\nthread, restored",
+      "vo": "Codex History Lens browses every local Codex session, right inside VS Code.",
+      "sub": "Browse local Codex history\ninside VS Code",
+      "min": 5.6,
+      "audio": 5.352,
+      "start": 5.71,
+      "dur": 6.502,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s3",
+      "kicker": "03 / BY DAY",
+      "headline": "Today, yesterday\nat a glance",
+      "vo": "Sessions are grouped by day and sorted by time, with titles pulled from Codex's own index.",
+      "sub": "Grouped by day, newest first\nTitles from Codex's index",
+      "min": 5.8,
+      "audio": 5.616,
+      "start": 12.212,
+      "dur": 6.766,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s4",
+      "kicker": "04 / FULL CONTEXT",
+      "headline": "Messages, reasoning\ntool calls",
+      "vo": "The chat panel restores every bubble, with reasoning and tool calls folded until you need them.",
+      "sub": "Every bubble restored\nExpand reasoning and tools",
+      "min": 6.2,
+      "audio": 5.544,
+      "start": 18.978,
+      "dur": 6.694,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s5",
+      "kicker": "05 / SEARCH",
+      "headline": "One query\nacross every session",
+      "vo": "Search across every session and jump straight to the matching message.",
+      "sub": "Search all sessions\nJump straight to the hit",
+      "min": 6.0,
+      "audio": 3.936,
+      "start": 25.672,
+      "dur": 6.0,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s6",
+      "kicker": "06 / LOCAL FIRST",
+      "headline": "Your history stays\non your machine",
+      "vo": "Everything is parsed locally. No telemetry, no uploads, and one-click Markdown export.",
+      "sub": "Parsed locally, never uploaded\nExport to Markdown",
+      "min": 6.0,
+      "audio": 5.904,
+      "start": 31.672,
+      "dur": 7.054,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s7",
+      "kicker": "07 / INSTALL",
+      "headline": "Keep your history\nwithin reach",
+      "vo": "Search Codex History Lens in the VS Code Marketplace and install it today.",
+      "sub": "VS Code Marketplace\nCodex History Lens",
+      "min": 5.6,
+      "audio": 4.368,
+      "start": 38.726,
+      "dur": 5.6,
+      "vo_at": 0.62
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "lang": "zh",
+  "product": "Codex History Lens",
+  "platform": "kuaishou",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "+15%",
+  "pitch": "-1Hz",
+  "total": 50.146,
+  "scenes": [
+    {
+      "id": "s1",
+      "kicker": "01 / 找不到那段对话",
+      "headline": "昨天的对话\n翻不到了",
+      "vo": "昨天让 Codex 改的那段代码，今天想找回来，却只记得大概。",
+      "sub": "翻不到昨天的那段对话\n只记得大概？",
+      "min": 5.4,
+      "audio": 4.656,
+      "start": 0.0,
+      "dur": 5.806,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s2",
+      "kicker": "02 / 它是什么",
+      "headline": "翻回每一段\nCodex 对话",
+      "vo": "Codex History Lens，在 VS Code 里直接翻阅本机 Codex 的全部历史会话。",
+      "sub": "在 VS Code 里\n翻阅本机 Codex 历史",
+      "min": 5.6,
+      "audio": 6.288,
+      "start": 5.806,
+      "dur": 7.438,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s3",
+      "kicker": "03 / 按天归档",
+      "headline": "今天和昨天\n一目了然",
+      "vo": "侧栏按天分组，标题取自 Codex 的会话索引，组内按时间倒序排列。",
+      "sub": "按天分组，时间倒序\n标题来自 Codex 索引",
+      "min": 5.8,
+      "audio": 6.096,
+      "start": 13.244,
+      "dur": 7.246,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s4",
+      "kicker": "04 / 完整还原",
+      "headline": "消息、思考\n工具调用都在",
+      "vo": "聊天面板按气泡还原对话，思考过程和工具调用默认折叠，需要时再展开。",
+      "sub": "气泡还原对话\n思考与工具调用可展开",
+      "min": 6.2,
+      "audio": 6.624,
+      "start": 20.49,
+      "dur": 7.774,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s5",
+      "kicker": "05 / 全文搜索",
+      "headline": "一句话\n搜遍所有会话",
+      "vo": "跨会话全文搜索，命中后直接跳到对应消息，不用一个个文件翻。",
+      "sub": "跨会话全文搜索\n命中直接跳到消息",
+      "min": 6.0,
+      "audio": 5.496,
+      "start": 28.264,
+      "dur": 6.646,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s6",
+      "kicker": "06 / 本地优先",
+      "headline": "记录只在\n你自己的电脑",
+      "vo": "解析全在本地完成，没有遥测，不上传会话；需要时还能一键导出 Markdown。",
+      "sub": "本地解析，不上传\n一键导出 Markdown",
+      "min": 6.0,
+      "audio": 6.672,
+      "start": 34.91,
+      "dur": 7.822,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s7",
+      "kicker": "07 / 现在就装",
+      "headline": "把历史\n留在手边",
+      "vo": "在 VS Code 扩展商店搜索 Codex History Lens，免费安装，打开就能用。",
+      "sub": "VS Code 扩展商店搜索\nCodex History Lens",
+      "min": 5.6,
+      "audio": 6.264,
+      "start": 42.732,
+      "dur": 7.414,
+      "vo_at": 0.62
+    }
+  ]
+}

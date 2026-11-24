@@ -21,6 +21,7 @@
 - 跨会话全文搜索：命中后直接跳到对应消息。
 - 点击回复里的本地文件链接可直接打开对应文件与行号；`http(s)` 链接用系统浏览器打开。
 - 一键导出为 Markdown，或打开原始 `.jsonl` 记录。
+- 右键会话选择“关注”，标题和星标变为金黄色；可随时取消关注，重启后仍保留关注状态。
 - 会话右键可**在 Codex 中继续对话**；已归档会话可**还原到 Codex 对话**，自动取消归档并打开。
 - 监听 `sessions/**/*.jsonl`，会话进行中也能刷新/自动更新。
 - 跟随 VS Code 明暗主题，除 VS Code 本身外无第三方依赖。
@@ -44,10 +45,10 @@ code --install-extension hkle.codex-history-lens-hkle
 方式一：在 VSIX 所在目录执行命令行安装。
 
 ```powershell
-code --install-extension .\dist\codex-history-lens-hkle-1.3.1.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.3.2.vsix
 ```
 
-方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.3.1.vsix`。
+方式二：VS Code 里打开「扩展」视图，点右上角 `...` → **从 VSIX 安装…**，选择 `dist\codex-history-lens-hkle-1.3.2.vsix`。
 
 安装后左侧活动栏会出现 **Codex 聊天** 图标；也可以按 `Ctrl+Shift+P` 执行 **Codex: 打开聊天记录**。
 

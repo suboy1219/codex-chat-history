@@ -21,6 +21,7 @@ Browse your local Codex sessions inside VS Code and jump back into the original 
 - Full-text search across every session, with a jump to the matching message.
 - Local file links in replies open the file and line directly; `http(s)` links open in your browser.
 - Export a session to Markdown or open the raw `.jsonl` file.
+- Right-click a session to follow it: its title and star turn gold. Unfollow it anytime; followed sessions are remembered across restarts.
 - Right-click a session to **Continue in Codex**; archived sessions can be **restored to Codex**, which unarchives and opens them.
 - Watches `sessions/**/*.jsonl`, so the list stays current while a session is running.
 - Follows the VS Code light/dark theme and has no third-party runtime dependencies.
@@ -44,10 +45,10 @@ code --install-extension hkle.codex-history-lens-hkle
 From a terminal:
 
 ```powershell
-code --install-extension .\dist\codex-history-lens-hkle-1.3.1.vsix
+code --install-extension .\dist\codex-history-lens-hkle-1.3.2.vsix
 ```
 
-Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-history-lens-hkle-1.3.1.vsix`.
+Or open the Extensions view in VS Code, click `...` in the top-right corner, choose **Install from VSIX...**, and select `dist\codex-history-lens-hkle-1.3.2.vsix`.
 
 After installation, a **Codex 聊天** icon appears in the activity bar. You can also run **Codex: 打开聊天记录** from the Command Palette.
 

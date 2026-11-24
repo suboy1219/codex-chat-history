@@ -2,6 +2,7 @@
 
 const path = require('path');
 const vscode = require('vscode');
+const { COLOR_ID } = require('./follows');
 
 function startOfDay(date) {
   const copy = new Date(date.getTime());
@@ -71,9 +72,10 @@ function groupFor(iso) {
 }
 
 class CodexTreeProvider {
-  constructor(store, state) {
+  constructor(store, state, followed) {
     this.store = store;
     this.state = state;
+    this.followed = followed;
     this.emitter = new vscode.EventEmitter();
     this.onDidChangeTreeData = this.emitter.event;
     this.lastCount = 0;
@@ -124,6 +126,7 @@ class CodexTreeProvider {
   }
 
   createSessionItem(session) {
+    const followed = this.followed.has(session);
     const item = new vscode.TreeItem(session.title, vscode.TreeItemCollapsibleState.None);
     const parts = [formatWhen(session.updatedAt)];
     const size = formatSize(session.size);
@@ -133,8 +136,11 @@ class CodexTreeProvider {
     item.description = parts.filter(Boolean).join(' · ');
     item.id = session.path;
     item.session = session;
-    item.contextValue = session.archived ? 'codexSessionArchived' : 'codexSession';
-    item.iconPath = new vscode.ThemeIcon(session.archived ? 'archive' : 'comment-discussion');
+    item.contextValue = `${session.archived ? 'codexSessionArchived' : 'codexSession'}${followed ? 'Followed' : ''}`;
+    item.resourceUri = this.followed.uri(session);
+    item.iconPath = followed
+      ? new vscode.ThemeIcon('star-full', new vscode.ThemeColor(COLOR_ID))
+      : new vscode.ThemeIcon(session.archived ? 'archive' : 'comment-discussion');
     item.command = {
       command: 'codexHistory.openSession',
       title: '打开聊天记录',
@@ -145,6 +151,9 @@ class CodexTreeProvider {
     tooltip.appendMarkdown('**');
     tooltip.appendText(session.title);
     tooltip.appendMarkdown('**\n\n');
+    if (followed) {
+      tooltip.appendMarkdown('★ 已关注\n\n');
+    }
     if (session.cwd) {
       tooltip.appendMarkdown('工作目录：');
       tooltip.appendText(session.cwd);
