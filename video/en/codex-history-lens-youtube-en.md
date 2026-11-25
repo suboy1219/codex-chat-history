@@ -7,7 +7,7 @@
 - Aspect: 1080 × 1920 (9:16)
 - Frame rate: 30 fps
 - Codec: H.264 High / yuv420p / MP4, AAC 192 kbps 48 kHz stereo
-- Duration: 44.3 seconds
+- Duration: 52.9 seconds
 - Voice: en-US-AndrewNeural, burned-in English captions
 
 ## Publishing copy
@@ -26,7 +26,8 @@ all sessions, and jump straight back into Codex.
 
 Everything is parsed locally. No telemetry, no uploads. Export any session to
 Markdown in one click, and keep multiple ChatGPT account logins encrypted in
-VS Code SecretStorage.
+VS Code SecretStorage. Switch accounts with one click, then reload the window
+to apply.
 
 Free and open source. Search **Codex History Lens** in the VS Code Marketplace.
 
@@ -43,8 +44,9 @@ Free and open source. Search **Codex History Lens** in the VS Code Marketplace.
 | 00:12.2–00:19.0 | Session sidebar grouped by day | Sessions are grouped by day and sorted by time, with titles pulled from Codex's own index. |
 | 00:19.0–00:25.7 | Chat bubbles, reasoning and tool calls | The chat panel restores every bubble, with reasoning and tool calls folded until you need them. |
 | 00:25.7–00:31.7 | Search query with highlighted hits | Search across every session and jump straight to the matching message. |
-| 00:31.7–00:38.7 | Shield, zero-upload counter, Markdown export | Everything is parsed locally. No telemetry, no uploads, and one-click Markdown export. |
-| 00:38.7–00:44.3 | Icon, install button, extension ID | Search Codex History Lens in the VS Code Marketplace and install it today. |
+| 00:31.7–00:40.2 | Account list, switch highlight, SecretStorage note | Save multiple ChatGPT logins, keep the credentials encrypted, and switch with one click. Reload the window to apply. |
+| 00:40.2–00:47.3 | Shield, zero-upload counter, Markdown export | Everything is parsed locally. No telemetry, no uploads, and one-click Markdown export. |
+| 00:47.3–00:52.9 | Icon, install button, extension ID | Search Codex History Lens in the VS Code Marketplace and install it today. |
 
 ## Upload notes
 

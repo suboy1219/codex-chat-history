@@ -8,7 +8,7 @@
   "voice": "en-US-AndrewNeural",
   "rate": "+6%",
   "pitch": "+0Hz",
-  "total": 44.326,
+  "total": 52.868,
   "scenes": [
     {
       "id": "s1",
@@ -72,25 +72,37 @@
     },
     {
       "id": "s6",
+      "kicker": "06 / MULTI-ACCOUNT",
+      "headline": "Personal, work\nswitch in one click",
+      "vo": "Save multiple ChatGPT logins, keep the credentials encrypted, and switch with one click. Reload the window to apply.",
+      "sub": "Save multiple ChatGPT logins\nEncrypted, one-click switch",
+      "min": 6.0,
+      "audio": 7.392,
+      "start": 31.672,
+      "dur": 8.542,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s7",
       "kicker": "06 / LOCAL FIRST",
       "headline": "Your history stays\non your machine",
       "vo": "Everything is parsed locally. No telemetry, no uploads, and one-click Markdown export.",
       "sub": "Parsed locally, never uploaded\nExport to Markdown",
       "min": 6.0,
       "audio": 5.904,
-      "start": 31.672,
+      "start": 40.214,
       "dur": 7.054,
       "vo_at": 0.62
     },
     {
-      "id": "s7",
-      "kicker": "07 / INSTALL",
+      "id": "s8",
+      "kicker": "08 / INSTALL",
       "headline": "Keep your history\nwithin reach",
       "vo": "Search Codex History Lens in the VS Code Marketplace and install it today.",
       "sub": "VS Code Marketplace\nCodex History Lens",
       "min": 5.6,
       "audio": 4.368,
-      "start": 38.726,
+      "start": 47.268,
       "dur": 5.6,
       "vo_at": 0.62
     }

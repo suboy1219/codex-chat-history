@@ -517,7 +517,153 @@ def draw_scene_s5(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
     return layer
 
 
-def draw_scene_s6(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
+def draw_scene_s6_accounts(local: float, fb: st.FontBook,
+                           scene: dict) -> Image.Image:
+    layer = scene_base()
+    vis = scene_base()
+    zh = fb.lang == "zh"
+    selected = 0 if local < 1.7 else 1
+    switched = local >= 1.7
+
+    st.card(vis, (110, 716, 970, 1284), radius=30, fill=(16, 21, 30),
+            outline=(49, 61, 78), top_glow=True)
+    for i, col in enumerate(((248, 109, 109), (255, 189, 96), (82, 201, 128))):
+        st.circle(vis, (134 + i * 21, 738, 146 + i * 21, 750), fill=col)
+    ImageDraw.Draw(vis).text((218, 744), "Codex · 账号" if zh else "Codex · accounts",
+                             font=fb.f("bold" if zh else "regular", 20),
+                             fill=st.TEXT, anchor="lm")
+    st.draw_lock(vis, 822, 744, st.MUTED, 0.68)
+    ImageDraw.Draw(vis).text((840, 744), "SecretStorage",
+                             font=fb.f("mono", 13), fill=st.FAINT, anchor="lm")
+    ImageDraw.Draw(vis).line((110, 770, 970, 770), fill=(39, 50, 65), width=1)
+
+    ImageDraw.Draw(vis).text((140, 796),
+                             "已保存 2 个账号" if zh else "2 accounts saved",
+                             font=fb.f("regular" if zh else "mono", 15),
+                             fill=st.MUTED, anchor="lm")
+    ImageDraw.Draw(vis).text((940, 796),
+                             "切换后重载窗口" if zh else "reload after switching",
+                             font=fb.f("regular" if zh else "mono", 13),
+                             fill=st.FAINT, anchor="rm")
+
+    accounts = ([
+        ("P", "个人账号", "me@example.com"),
+        ("W", "工作账号", "work@example.com"),
+    ] if zh else [
+        ("P", "Personal", "me@example.com"),
+        ("W", "Work", "work@example.com"),
+    ])
+    for i, (glyph, name, email) in enumerate(accounts):
+        p = st.reveal(local, 0.14 + i * 0.18, 0.45)
+        if p <= 0:
+            continue
+        y = 824 + i * 92
+        is_sel = i == selected
+        fill = st.mix(st.BG, (20, 48, 80) if is_sel else (24, 31, 43), p)
+        outline = st.mix(st.BG, (39, 91, 143) if is_sel else (46, 58, 74), p)
+        st.rounded(vis, (140, y, 940, y + 82), 14, fill=fill, outline=outline,
+                   width=2 if is_sel else 1)
+        if is_sel:
+            st.rounded(vis, (140, y + 9, 145, y + 73), 2, fill=st.ACCENT)
+        st.circle(vis, (162, y + 19, 216, y + 73),
+                  fill=st.mix(st.BG, (15, 52, 88), p),
+                  outline=st.mix(st.BG, st.ACCENT if is_sel else st.LINE, p),
+                  width=2)
+        ImageDraw.Draw(vis).text((189, y + 46), glyph,
+                                 font=fb.f("bold", 20),
+                                 fill=st.mix(st.BG, st.ACCENT_SOFT if is_sel else st.TEXT, p),
+                                 anchor="mm")
+        ImageDraw.Draw(vis).text((232, y + 26), name,
+                                 font=fb.f("bold", 21),
+                                 fill=st.mix(st.BG, st.TEXT, p), anchor="lm")
+        ImageDraw.Draw(vis).text((232, y + 54), email,
+                                 font=fb.f("mono", 14),
+                                 fill=st.mix(st.BG, st.MUTED, p), anchor="lm")
+
+        badge = ("当前" if is_sel else "已保存") if zh else ("Current" if is_sel else "Saved")
+        bf = fb.f("bold", 14 if zh else 12)
+        bw = bf.getlength(badge) + 36
+        bx = 920 - bw
+        st.rounded(vis, (bx, y + 26, 920, y + 56), 15,
+                   fill=st.mix(st.BG, (20, 44, 40) if is_sel else (29, 37, 49), p),
+                   outline=st.mix(st.BG, (35, 82, 72) if is_sel else (47, 59, 75), p))
+        ImageDraw.Draw(vis).text((bx + bw / 2, y + 42), badge, font=bf,
+                                 fill=st.mix(st.BG, st.TOOL if is_sel else st.MUTED, p),
+                                 anchor="mm")
+
+    p_add = st.reveal(local, 0.55, 0.45)
+    if p_add > 0:
+        st.rounded(vis, (140, 1016, 940, 1078), 12,
+                   fill=st.mix(st.BG, (20, 27, 37), p_add),
+                   outline=st.mix(st.BG, (44, 56, 72), p_add))
+        plus_fill = st.mix(st.BG, st.ACCENT, p_add)
+        ImageDraw.Draw(vis).line((171, 1047, 185, 1047), fill=plus_fill, width=2)
+        ImageDraw.Draw(vis).line((178, 1040, 178, 1054), fill=plus_fill, width=2)
+        ImageDraw.Draw(vis).text((202, 1048),
+                                 "添加账号（官方网页登录）" if zh
+                                 else "Add account (official web login)",
+                                 font=fb.f("regular" if zh else "mono", 16),
+                                 fill=st.mix(st.BG, st.TEXT, p_add), anchor="lm")
+        ImageDraw.Draw(vis).text((920, 1048),
+                                 "临时目录" if zh else "temp profile",
+                                 font=fb.f("regular" if zh else "mono", 12),
+                                 fill=st.mix(st.BG, st.FAINT, p_add), anchor="rm")
+
+    p_note = st.reveal(local, 0.75, 0.45)
+    if p_note > 0:
+        st.draw_lock(vis, 152, 1112, st.mix(st.BG, st.TOOL, p_note), 0.72)
+        ImageDraw.Draw(vis).text((170, 1112),
+                                 "凭据加密保存在 VS Code SecretStorage" if zh
+                                 else "Credentials encrypted in VS Code SecretStorage",
+                                 font=fb.f("regular" if zh else "mono", 14),
+                                 fill=st.mix(st.BG, st.MUTED, p_note), anchor="lm")
+
+    st.rounded(vis, (140, 1152, 940, 1212), 12, fill=(11, 17, 25),
+               outline=(41, 54, 70))
+    st.circle(vis, (162, 1168, 182, 1188), outline=st.ACCENT, width=2)
+    ImageDraw.Draw(vis).arc((154, 1180, 190, 1212), start=200, end=340,
+                            fill=st.ACCENT, width=2)
+    ImageDraw.Draw(vis).text((204, 1182),
+                             ("Codex · 工作账号" if selected else "Codex · 个人账号")
+                             if zh else
+                             ("Codex · Work" if selected else "Codex · Personal"),
+                             font=fb.f("bold", 17), fill=st.TEXT, anchor="lm")
+    if switched:
+        ImageDraw.Draw(vis).text((920, 1182),
+                                 "已切换 · 重载窗口生效" if zh
+                                 else "Switched · reload to apply",
+                                 font=fb.f("regular" if zh else "mono", 13),
+                                 fill=st.TOOL, anchor="rm")
+    else:
+        ImageDraw.Draw(vis).text((920, 1182),
+                                 "点击切换" if zh else "click to switch",
+                                 font=fb.f("regular" if zh else "mono", 13),
+                                 fill=st.FAINT, anchor="rm")
+
+    labels = (["加密备份", "不写设置", "重载生效"] if zh
+              else ["ENCRYPTED", "NOT IN SETTINGS", "RELOAD TO APPLY"])
+    widths = ([158, 158, 176] if zh else [176, 234, 250])
+    gap = 14
+    total = sum(widths) + gap * (len(widths) - 1)
+    x = (W - total) / 2
+    for i, (text, cw) in enumerate(zip(labels, widths)):
+        p = st.reveal(local, 1.05 + i * 0.10, 0.4)
+        if p > 0:
+            st.draw_chip(vis, x, 1302, cw, 52, text, fb, 17 if zh else 13,
+                         fg=st.mix(st.BG, st.TEXT, p),
+                         bg=st.mix(st.BG, (24, 33, 44), p),
+                         border=st.mix(st.BG, (48, 62, 78), p),
+                         dot=st.mix(st.BG, st.TOOL, p), mono=not zh)
+        x += cw + gap
+
+    reveal_visual(layer, vis, local)
+    draw_kicker(layer, scene["kicker"], local, fb, st.ACCENT)
+    draw_headline(layer, scene["headline"], local, fb)
+    st.draw_sub(layer, fb, scene["sub"].split("\n"), local, st.ACCENT)
+    return layer
+
+
+def draw_scene_s7(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
     layer = scene_base()
     vis = scene_base()
     zh = fb.lang == "zh"
@@ -594,7 +740,7 @@ def draw_scene_s6(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
     return layer
 
 
-def draw_scene_s7(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
+def draw_scene_s8(local: float, fb: st.FontBook, scene: dict) -> Image.Image:
     layer = scene_base()
     vis = scene_base()
     zh = fb.lang == "zh"
@@ -652,8 +798,9 @@ SCENE_FN = {
     "s3": draw_scene_s3,
     "s4": draw_scene_s4,
     "s5": draw_scene_s5,
-    "s6": draw_scene_s6,
+    "s6": draw_scene_s6_accounts,
     "s7": draw_scene_s7,
+    "s8": draw_scene_s8,
 }
 
 

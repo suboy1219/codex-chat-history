@@ -213,6 +213,18 @@ def draw_check(layer: Image.Image, cx: float, cy: float, r: float = 14,
               width=max(2, int(r * 0.28)), joint="curve")
 
 
+def draw_lock(layer: Image.Image, cx: float, cy: float, color=MUTED,
+              scale: float = 1.0) -> None:
+    draw = ImageDraw.Draw(layer)
+    w = 20 * scale
+    h = 16 * scale
+    draw.rounded_rectangle((cx - w / 2, cy - h / 2 + 3, cx + w / 2, cy + h / 2 + 3),
+                           radius=3 * scale, outline=color,
+                           width=max(1, int(2 * scale)))
+    draw.arc((cx - w * 0.34, cy - h * 0.85, cx + w * 0.34, cy + h * 0.30),
+             start=180, end=360, fill=color, width=max(1, int(2 * scale)))
+
+
 def draw_search(layer: Image.Image, cx: float, cy: float, r: float = 12,
                 color=MUTED, width: int = 3) -> None:
     draw = ImageDraw.Draw(layer)

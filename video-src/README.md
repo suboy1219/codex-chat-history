@@ -6,7 +6,7 @@ Codex History Lens 竖版宣传片的源码。画面用 Pillow 逐帧绘制，�
 ## 文件
 
 - `style.py`：品牌色、字体、图标、背景、窗口、聊天气泡与文字工具
-- `render_video.py`：7 个镜头、转场、封面、ffmpeg 编码
+- `render_video.py`：8 个镜头、转场、封面、ffmpeg 编码
 - `build_assets.py`：逐镜头 TTS、配乐、混音、时长回填
 - `timeline.zh.json` / `timeline.en.json`：文案与时间的唯一事实源
 

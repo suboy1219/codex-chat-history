@@ -8,7 +8,7 @@
   "voice": "zh-CN-YunxiNeural",
   "rate": "+15%",
   "pitch": "-1Hz",
-  "total": 50.146,
+  "total": 57.68,
   "scenes": [
     {
       "id": "s1",
@@ -72,25 +72,37 @@
     },
     {
       "id": "s6",
+      "kicker": "06 / 多账号切换",
+      "headline": "个人号与工作号\n一键切换",
+      "vo": "还能保存多个 ChatGPT 账号，登录凭据加密保存；点一下切换，重载窗口后生效。",
+      "sub": "保存多个 ChatGPT 账号\n加密备份，一键切换",
+      "min": 6.0,
+      "audio": 6.384,
+      "start": 34.91,
+      "dur": 7.534,
+      "vo_at": 0.62
+    },
+    {
+      "id": "s7",
       "kicker": "06 / 本地优先",
       "headline": "记录只在\n你自己的电脑",
       "vo": "解析全在本地完成，没有遥测，不上传会话；需要时还能一键导出 Markdown。",
       "sub": "本地解析，不上传\n一键导出 Markdown",
       "min": 6.0,
       "audio": 6.672,
-      "start": 34.91,
+      "start": 42.444,
       "dur": 7.822,
       "vo_at": 0.62
     },
     {
-      "id": "s7",
-      "kicker": "07 / 现在就装",
+      "id": "s8",
+      "kicker": "08 / 现在就装",
       "headline": "把历史\n留在手边",
       "vo": "在 VS Code 扩展商店搜索 Codex History Lens，免费安装，打开就能用。",
       "sub": "VS Code 扩展商店搜索\nCodex History Lens",
       "min": 5.6,
       "audio": 6.264,
-      "start": 42.732,
+      "start": 50.266,
       "dur": 7.414,
       "vo_at": 0.62
     }

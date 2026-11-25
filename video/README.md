@@ -7,8 +7,8 @@ Pillow 渲染代码，只替换 `timeline.*.json` 里的文案、配音和字体
 
 | 语言 | 平台 | 时长 | 文件 |
 | --- | --- | --- | --- |
-| 中文 | 快手（抖音 / 视频号可直接复用） | 50.1 s | `zh/codex-history-lens-kuaishou-zh-1080x1920.mp4` |
-| 英文 | YouTube Shorts | 44.3 s | `en/codex-history-lens-youtube-en-1080x1920.mp4` |
+| 中文 | 快手（抖音 / 视频号可直接复用） | 57.7 s | `zh/codex-history-lens-kuaishou-zh-1080x1920.mp4` |
+| 英文 | YouTube Shorts | 52.9 s | `en/codex-history-lens-youtube-en-1080x1920.mp4` |
 
 每条片子交付三件套：
 
@@ -34,7 +34,7 @@ video/
 
 video-src/
 ├─ style.py            品牌色、字体、图标、背景、窗口与聊天气泡工具
-├─ render_video.py     7 个镜头的逐帧合成与 ffmpeg 编码
+├─ render_video.py     8 个镜头的逐帧合成与 ffmpeg 编码
 ├─ build_assets.py     edge-tts 配音、numpy 配乐、混音与时长回填
 ├─ timeline.zh.json    中文唯一事实源
 ├─ timeline.en.json    英文唯一事实源
@@ -59,8 +59,9 @@ video-src/
 | 13.2–20.5 s | 按天分组的历史侧栏 | 今天 / 昨天 / 具体日期 |
 | 20.5–28.3 s | 完整聊天面板 | 消息、思考过程、工具调用可展开 |
 | 28.3–34.9 s | 跨会话全文搜索 | 命中后直接跳到消息 |
-| 34.9–42.7 s | 本地优先 | 不上传、无遥测、Markdown 导出 |
-| 42.7–50.1 s | 扩展商店安装 | 行动号召与搜索词 |
+| 34.9–42.4 s | 多账号切换 | 加密保存、一键切换、重载生效 |
+| 42.4–50.3 s | 本地优先 | 不上传、无遥测、Markdown 导出 |
+| 50.3–57.7 s | 扩展商店安装 | 行动号召与搜索词 |
 
 ## 重新生成
 
